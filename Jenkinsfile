@@ -1,21 +1,15 @@
 Jenkinsfile (Declarative Pipeline)
 pipeline {
-    agent { docker { image 'maven:3.3.3' } }  
-    environment {
-        // Using returnStdout
-        CC = """${sh(
-                returnStdout: true,
-                script: 'echo "clang"'
-            )}""" 
-        // Using returnStatus
-        EXIT_STATUS = """${sh(
-                returnStatus: true,
-                script: 'exit 1'
-            )}"""
+    agent any
+
     stages {
-        stage('test') {
+        stage('Test') {
             steps {
-                sh 'mvn --version'
+                /* `make check` returns non-zero on test failures,
+                * using `true` to allow the Pipeline to continue nonetheless
+                */
+                sh 'make check || true' 
+                junit '**/target/*.xml' 
             }
         }
     }
